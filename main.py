@@ -67,5 +67,10 @@ def contact():
 def edit_post(post_id):
     return redirect(url_for('show_post', post_id=post_id))
 
+@app.route("/new-post")
+def new_post():
+    form = CreatePostForm()
+    return render_template('make-post.html', form=form)
+
 if __name__ == "__main__":
     app.run(debug=True)
