@@ -68,7 +68,6 @@ def edit_post(post_id):
         time_now = dt.datetime.now()
         post.title = request.form.get('title')
         post.subtitle = request.form.get('subtitle')
-        post.date = f'{time_now.strftime("%A")} {time_now.day}, {time_now.year}'
         post.body = request.form.get('body')
         post.author = request.form.get('author')
         post.img_url = request.form.get('img_url')
@@ -92,8 +91,8 @@ def new_post():
         post = BlogPost(
             title=request.form.get('title'),
             subtitle=request.form.get('subtitle'),
-            date=f'{time_now.strftime("%A")} {time_now.day}, {time_now.year}',
             body=request.form.get('body'),
+            date=f'{time_now.strftime("%A")} {time_now.day}, {time_now.year}',
             author=request.form.get('author'),
             img_url=request.form.get('img_url'),
         )
@@ -101,6 +100,13 @@ def new_post():
         db.session.commit()
         return redirect(url_for('get_all_posts'))
     return render_template('make-post.html', form=form, header='New post')
+
+@app.route("/delete/<int:index>")
+def delete(index):
+    requested_post = BlogPost.query.get(index)
+    db.session.delete(requested_post)
+    db.session.commit()
+    return redirect(url_for('get_all_posts'))
 
 if __name__ == "__main__":
     app.run(debug=True)
