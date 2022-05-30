@@ -62,7 +62,27 @@ def contact():
 
 @app.route("/edit/<int:post_id>", methods=["GET", "POST"])
 def edit_post(post_id):
-    return redirect(url_for('show_post', post_id=post_id))
+    form = CreatePostForm()
+    post = BlogPost.query.get(post_id)
+    if form.validate_on_submit():
+        time_now = dt.datetime.now()
+        post.title = request.form.get('title')
+        post.subtitle = request.form.get('subtitle')
+        post.date = f'{time_now.strftime("%A")} {time_now.day}, {time_now.year}'
+        post.body = request.form.get('body')
+        post.author = request.form.get('author')
+        post.img_url = request.form.get('img_url')
+        db.session.commit()
+        return redirect(url_for('get_all_posts'))
+
+    form = CreatePostForm(
+        title=post.title,
+        subtitle=post.subtitle,
+        img_url=post.img_url,
+        author=post.author,
+        body=post.body
+    )
+    return render_template('make-post.html', form=form, header='Edit post')
 
 @app.route("/new-post", methods=["GET", "POST"])
 def new_post():
@@ -80,7 +100,7 @@ def new_post():
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('get_all_posts'))
-    return render_template('make-post.html', form=form)
+    return render_template('make-post.html', form=form, header='New post')
 
 if __name__ == "__main__":
     app.run(debug=True)
